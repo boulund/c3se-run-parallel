@@ -11,14 +11,14 @@ def parse_commandline():
     """Parse commandline.
     """
 
-    desc="""Run in parallel on C3SE Glenn. Fredrik Boulund 2014"""
+    desc="""Run in parallel on C3SE Glenn. Fredrik Boulund (c) 2014"""
 
     parser = argparse.ArgumentParser(description=desc)
 
     slurm = parser.add_argument_group("SLURM", "Set slurm parameters.")
     slurm.add_argument("-N", type=int,
         default=1,
-        help="Number of nodes [%(default)s].")
+        help="Number of nodes. Unless you're running MPI programs, this should be set to 1 [%(default)s].")
     slurm.add_argument("-p", 
         default="glenn",
         help="Slurm partition [%(default)s].")
@@ -35,11 +35,10 @@ def parse_commandline():
         help="Program and arguments in a single quoted string, "+\
             "e.g. 'blat dbfile.fasta {query} -t=dnax q=prot {query}.blast8'. "+\
             "{query} is substituted for the filenames specified on "+\
-            "the command line (one at a time).")
+            "the command line (one per node).")
     program_parser.add_argument("query", nargs="+", metavar="FILE",
         default="",
         help="Query file(s).")
-
 
     if len(argv)<2:
         parser.print_help()
@@ -68,6 +67,7 @@ def generate_sbatch_script(options, query_file):
             t=options.t, 
             call=call)
     return sbatch_script
+
 
 
 def call_sbatch(sbatch_script):
